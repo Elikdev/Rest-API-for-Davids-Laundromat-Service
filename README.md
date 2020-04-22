@@ -1,4 +1,4 @@
-# ![Simple Node/Express/Mongoose boilerplate]
+# ![Rest-API-for-Davids-Laundromat-Service]
 
 To get the server running locally:
 - Clone this Repository
