@@ -4,8 +4,18 @@ const Payment = models.Payment;
 const Customer = models.Customer;
 const Staff = models.Staff;
 const { validationResult } = require('express-validator');
+
 //get all payments made
 exports.getPayments = async (req, res) => {
+	const staffId = req.staff._id;
+
+	//check if the staff making the request is still a registered staff
+	const registeredStaff = await Staff.findById(staffId);
+	if (!registeredStaff)
+		return res
+			.status(401)
+			.json({ message: 'Sorry, you do not have access to this route' });
+
 	try {
 		const payments = await Payment.find()
 			.populate('wash', 'washDate')
@@ -31,6 +41,14 @@ exports.getPayments = async (req, res) => {
 //get a single payment
 exports.getPaymentById = async (req, res) => {
 	const id = req.params.id;
+	const staffId = req.staff._id;
+
+	//check if the staff making the request is still a registered staff
+	const registeredStaff = await Staff.findById(staffId);
+	if (!registeredStaff)
+		return res
+			.status(401)
+			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const payment = await Payment.findById(id)
@@ -53,7 +71,7 @@ exports.getPaymentById = async (req, res) => {
 exports.newPayment = async (req, res) => {
 	try {
 		const id = req.staff._id;
-		const { amount, payment_mode, customer_name, washId } = req.body;
+		const { payment_mode, washId } = req.body;
 
 		//get the validation results
 		const errors = validationResult(req);
@@ -64,11 +82,21 @@ exports.newPayment = async (req, res) => {
 			});
 		}
 
-		//modify the amount and date
+		//check the validity of the wash Id
+		const washDoc = await Wash.findOne({ washId: washId });
+		if (!washDoc) return res.status(400).json({ message: 'Invalid washId' });
+
+		///check if the washId has been generated before
+		const checkWashId = await Payment.findOne({ washId: washId });
+		if (checkWashId)
+			return res.status(400).json({
+				message: 'WashId has been used, generate a new one!',
+			});
+
+		//modify the date
+
 		const date = new Date();
 		const payment_date = date.toString();
-
-		const name = customer_name.toLowerCase();
 
 		const registeredStaff = await Staff.findById(id);
 		if (!registeredStaff)
@@ -78,26 +106,20 @@ exports.newPayment = async (req, res) => {
 
 		const payment = new Payment({
 			washId,
-			amount,
-			customer_name: name,
+			amount: washDoc.amount,
+			customer_name: washDoc.customer_name, //extract the name of the customer from the washDoc
 			payment_mode,
 			payment_date,
 		});
 
 		//get the customer doc
 		const customerDoc = await Customer.findOne({
-			customer_name: name,
+			customer_name: washDoc.customer_name,
 		});
 		if (!customerDoc)
 			return res.status(400).json({
 				message: 'No customer with such name, register the customer first',
 			});
-
-		//check the washid
-		const washDoc = await Wash.findOne({
-			washId: washId,
-		});
-		if (!washDoc) return res.status(400).json({ message: 'Invalid wash ID' });
 
 		//save the payment to database and update it as well
 		const savedPayment = await payment.save();
@@ -112,7 +134,7 @@ exports.newPayment = async (req, res) => {
 			//update the wash in the customer model
 			const updatedCustomer = await Customer.findByIdAndUpdate(
 				customerDoc._id,
-				{ $push: { washes: washDoc._id } },
+				{ $push: { washes: washDoc._id, payments: savedPayment._id } },
 				{ new: true, useFindAndModify: false }
 			);
 
@@ -133,12 +155,12 @@ exports.newPayment = async (req, res) => {
 			);
 
 			return res.status(201).json({
-				message: 'successful payment',
+				message: 'Successful payment',
 				updatedPayment,
 			});
 		}
 	} catch (error) {
-		res.status(500).json({
+		return res.status(500).json({
 			message: 'error in recording payment',
 			error: error.message,
 		});
@@ -148,8 +170,19 @@ exports.newPayment = async (req, res) => {
 //delete a payment
 exports.deletePaymentById = async (req, res) => {
 	const id = req.params.id;
+	const staffId = req.staff._id;
+
+	//check if the staff making the request is still a registered staff
+	const registeredStaff = await Staff.findById(staffId);
+	if (!registeredStaff)
+		return res
+			.status(401)
+			.json({ message: 'Sorry, you do not have access to this route' });
+
 	try {
-		const deletedPayment = await Payment.findByIdAndRemove(id);
+		const deletedPayment = await Payment.findByIdAndRemove(id, {
+			useFindAndModify: false,
+		});
 
 		if (!deletedPayment) {
 			return res.status(404).json({
@@ -170,6 +203,15 @@ exports.deletePaymentById = async (req, res) => {
 
 //delete all payments
 exports.deleteAllPayments = async (req, res) => {
+	const staffId = req.staff._id;
+
+	//check if the staff making the request is still a registered staff
+	const registeredStaff = await Staff.findById(staffId);
+	if (!registeredStaff)
+		return res
+			.status(401)
+			.json({ message: 'Sorry, you do not have access to this route' });
+
 	try {
 		const deletedPayments = await Payment.deleteMany({});
 

@@ -102,11 +102,14 @@ exports.registerStaff = async (req, res) => {
 	const date = new Date();
 	const resumption_date = date.toDateString();
 
+	//modify the mobile number to a nigerian number
+	modifiedNum = `(+234)-${mobile_num}`;
+
 	const newStaff = new Staff({
 		name,
 		email,
 		password: hashedPassword,
-		mobile_num,
+		mobile_num: modifiedNum,
 		address,
 		resumption_date,
 	});
@@ -273,7 +276,15 @@ exports.removeAllStaffs = async (req, res) => {
 };
 
 //Sign out staff
-exports.signOutStaff = (req, res) => {
+exports.signOutStaff = async (req, res) => {
+	//check if the staff making the request is still in the database
+	const requestId = req.staff._id;
+	const isStaff = await Staff.findById(requestId);
+	if (!isStaff) {
+		return res.status(403).json({
+			message: 'Invalid token!!!',
+		});
+	}
 	delete req.header('auth-token');
 
 	res.status(200).json({

@@ -16,6 +16,10 @@ const WashSchema = mongoose.Schema({
 	washId: {
 		type: String,
 	},
+	amount: {
+		type: String,
+		required: true,
+	},
 	payment: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Payment',

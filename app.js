@@ -34,5 +34,5 @@ app.use('/api/v1/wash', washRouter);
 app.use('/api/v1/payment', paymentRouter);
 
 app.listen(port, () => {
-	console.log(`App is running on port ${port} at ${hostname}${port}`);
+	console.log(`App is running on port ${port} at ${hostname}${port}/api/v1`);
 });

@@ -15,7 +15,7 @@ const StaffSchema = mongoose.Schema(
 			required: true,
 		},
 		mobile_num: {
-			type: Number,
+			type: String,
 			required: true,
 		},
 		address: {
