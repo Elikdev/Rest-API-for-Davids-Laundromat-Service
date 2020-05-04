@@ -1,5 +1,6 @@
 const customerRoutes = require('express').Router();
 const auth = require('../helpers/verifyToken'); //middleware
+const checkStaff = require('../helpers/checkStaff'); //middleware
 const { check } = require('express-validator');
 
 //controllers
@@ -23,21 +24,21 @@ const validateCustomer = [
 ];
 
 //register a new customer
-customerRoutes.post('/register', validateCustomer, auth, register);
+customerRoutes.post('/register', validateCustomer, auth, checkStaff, register);
 
 //get all the customers
-customerRoutes.get('/all', auth, getAll);
+customerRoutes.get('/all', auth, checkStaff, getAll);
 
 //get customer by id
-customerRoutes.get('/:id', auth, getOne);
+customerRoutes.get('/:id', auth, checkStaff, getOne);
 
 //update customer by id
-customerRoutes.put('/:id', auth, updateOne);
+customerRoutes.put('/:id', auth, checkStaff, updateOne);
 
 //delete customer by id
-customerRoutes.delete('/:id', auth, deleteOne);
+customerRoutes.delete('/:id', auth, checkStaff, deleteOne);
 
 //delete all customers
-customerRoutes.delete('/delete/all', auth, deleteAll);
+customerRoutes.delete('/delete/all', auth, checkStaff, deleteAll);
 
 module.exports = customerRoutes;

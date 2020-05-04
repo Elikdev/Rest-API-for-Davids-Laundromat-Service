@@ -1,6 +1,9 @@
 const indexRouter = require('express').Router();
 const auth = require('../helpers/verifyToken'); //middleware
-const { check } = require('express-validator');
+const checkStaff = require('../helpers/checkStaff'); //middleware
+const { check, body } = require('express-validator');
+const models = require('../models/index');
+const Staff = models.Staff;
 
 //controllers
 const {
@@ -24,11 +27,25 @@ const validateRegister = [
 	).isLength({ min: 10, max: 10 }),
 	check('password', 'Password must be 6 chars long').isLength({ min: 6 }),
 	check('address', 'Address is empty').notEmpty(),
+	body('email').custom((value) => {
+		return Staff.findOne({ email: value }).then((staff) => {
+			if (staff) {
+				return Promise.reject('E-mail already in use');
+			}
+		});
+	}),
 ];
 
 const validateLogin = [
 	check('email', 'Email is invalid or empty').isEmail(),
 	check('password', 'Password must be 6 chars long').isLength({ min: 6 }),
+	body('email').custom((value) => {
+		return Staff.findOne({ email: value }).then((staff) => {
+			if (!staff) {
+				return Promise.reject('Email is invalid');
+			}
+		});
+	}),
 ];
 
 //register a new staff
@@ -42,18 +59,18 @@ indexRouter.get('/signout', auth, signOutStaff);
 
 //all routes here require auth-token
 //get all staffs
-indexRouter.get('/all', auth, allStaffs);
+indexRouter.get('/all', auth, checkStaff, allStaffs);
 
 //get staff by id
-indexRouter.get('/:id', auth, getStaff);
+indexRouter.get('/:id', auth, checkStaff, getStaff);
 
 //update staff by id
-indexRouter.put('/update/:id', auth, updateStaff);
+indexRouter.put('/update/:id', auth, checkStaff, updateStaff);
 
 //delete staff by id
-indexRouter.delete('/:id', auth, removeStaff);
+indexRouter.delete('/:id', auth, checkStaff, removeStaff);
 
 //delete all the staffs
-indexRouter.delete('/delete/all', auth, removeAllStaffs);
+indexRouter.delete('/delete/all', auth, checkStaff, removeAllStaffs);
 
 module.exports = indexRouter;

@@ -4,15 +4,6 @@ const Staff = models.Staff;
 const { validationResult } = require('express-validator');
 
 exports.getAll = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const customers = await Customer.find()
 			.populate('washes', 'washDate washId number_of_wash')
@@ -36,15 +27,6 @@ exports.getAll = async (req, res) => {
 
 exports.register = async (req, res) => {
 	const { customer_name, email, mobile_num, address } = req.body;
-
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	//get the validation results
 	const errors = validationResult(req);
@@ -90,14 +72,6 @@ exports.register = async (req, res) => {
 
 exports.getOne = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const customer = await Customer.findById(id)
@@ -123,14 +97,6 @@ exports.getOne = async (req, res) => {
 
 exports.updateOne = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const customer = await Customer.findByIdAndUpdate(id, req.body, {
@@ -154,14 +120,6 @@ exports.updateOne = async (req, res) => {
 
 exports.deleteOne = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 	try {
 		const deletedCustomer = await Customer.findByIdAndRemove(id, {
 			useFindAndModify: false,
@@ -181,14 +139,6 @@ exports.deleteOne = async (req, res) => {
 };
 
 exports.deleteAll = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 	try {
 		const deletedCustomers = await Customer.deleteMany({});
 
