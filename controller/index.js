@@ -76,14 +76,11 @@ exports.registerStaff = async (req, res) => {
 	const date = new Date();
 	const resumption_date = date.toDateString();
 
-	//modify the mobile number to a nigerian number
-	modifiedNum = `(+234)-${mobile_num}`;
-
 	const newStaff = new Staff({
 		name,
 		email,
 		password: hashedPassword,
-		mobile_num: modifiedNum,
+		mobile_num,
 		address,
 		resumption_date,
 	});

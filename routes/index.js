@@ -21,10 +21,11 @@ const {
 const validateRegister = [
 	check('email', 'Email is invalid or empty').isEmail(),
 	check('name', 'Name is empty').notEmpty(),
-	check(
-		'mobile_num',
-		'Mobile Number must be a nigerian number, starting with the second digit and must be 10 digits long(e.g 9156435672)'
-	).isLength({ min: 10, max: 10 }),
+	check('mobile_num')
+		.isLength({ min: 10, max: 15 })
+		.withMessage('Mobile Number must between 10 to 15 characters long')
+		.matches(/^[+-\d]+$/)
+		.withMessage('Mobile Number must be a valid Nigerian number'),
 	check('password', 'Password must be 6 chars long').isLength({ min: 6 }),
 	check('address', 'Address is empty').notEmpty(),
 	body('email').custom((value) => {

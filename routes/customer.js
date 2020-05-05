@@ -16,10 +16,11 @@ const {
 const validateCustomer = [
 	check('customer_name', "Customer's name is empty").notEmpty(),
 	check('email', 'Email is invalid or empty').isEmail(),
-	check(
-		'mobile_num',
-		'Mobile Number must be a nigerian number, starting with the second digit and must be 10 digits long(e.g 9156435672)'
-	).isLength({ min: 10, max: 10 }),
+	check('mobile_num')
+		.isLength({ min: 10, max: 15 })
+		.withMessage('Mobile Number must between 10 to 15 characters long')
+		.matches(/^[+-\d]+$/)
+		.withMessage('Mobile Number must be a valid Nigerian number'),
 	check('address', 'Address is empty').notEmpty(),
 ];
 
