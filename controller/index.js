@@ -8,15 +8,6 @@ const { validationResult } = require('express-validator');
 
 //get all the staffs
 exports.allStaffs = async (req, res) => {
-	//check if the staff making the request is still in the database
-	const requestId = req.staff._id;
-	const isStaff = await Staff.findById(requestId);
-	if (!isStaff) {
-		return res.status(403).json({
-			message: 'Invalid token!!!',
-		});
-	}
-
 	try {
 		const staffs = await Staff.find()
 			.populate('washes', 'washDate washId')
@@ -42,15 +33,6 @@ exports.allStaffs = async (req, res) => {
 exports.getStaff = async (req, res) => {
 	try {
 		const id = req.params.id;
-
-		//check if the staff making the request is still in the database
-		const requestId = req.staff._id;
-		const isStaff = await Staff.findById(requestId);
-		if (!isStaff) {
-			return res.status(403).json({
-				message: 'Invalid token!!!',
-			});
-		}
 
 		const staff = await Staff.findById(id)
 			.populate('washes', 'washDate washId')
@@ -86,14 +68,6 @@ exports.registerStaff = async (req, res) => {
 		});
 	}
 
-	//check if email exists in the database
-	const staff = await Staff.findOne({ email });
-	if (staff) {
-		return res.status(501).json({
-			message: 'Oooops...Email already exists in the database',
-		});
-	}
-
 	//hash the password
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(password, salt);
@@ -102,14 +76,11 @@ exports.registerStaff = async (req, res) => {
 	const date = new Date();
 	const resumption_date = date.toDateString();
 
-	//modify the mobile number to a nigerian number
-	modifiedNum = `(+234)-${mobile_num}`;
-
 	const newStaff = new Staff({
 		name,
 		email,
 		password: hashedPassword,
-		mobile_num: modifiedNum,
+		mobile_num,
 		address,
 		resumption_date,
 	});
@@ -127,7 +98,7 @@ exports.registerStaff = async (req, res) => {
 		if (staffDoc) {
 			return res.status(201).json({
 				message: 'New staff created successfully',
-				Staff: staffDoc,
+				Staff: staffDoc._id,
 				accesstoken: accesstoken,
 			});
 		}
@@ -153,7 +124,6 @@ exports.signInStaff = async (req, res) => {
 		}
 
 		const validEmail = await Staff.findOne({ email: email });
-		if (!validEmail) return res.status(403).json({ message: 'Invalid Email' });
 
 		//compare password
 		const validPassword = await bcrypt.compare(password, validEmail.password);
@@ -168,9 +138,11 @@ exports.signInStaff = async (req, res) => {
 		);
 		res.header('auth-token', accesstoken);
 
-		return res
-			.status(200)
-			.json({ message: 'Staff signed in successfully', accesstoken });
+		return res.status(200).json({
+			message: 'Staff signed in successfully',
+			Staff: validEmail,
+			accesstoken,
+		});
 	} catch (error) {
 		res.status(500).json({
 			message: 'Error in signing staff in',
@@ -182,15 +154,6 @@ exports.signInStaff = async (req, res) => {
 //update staff
 exports.updateStaff = async (req, res) => {
 	const id = req.params.id;
-
-	//check if the staff making the request is still in the database
-	const requestId = req.staff._id;
-	const isStaff = await Staff.findById(requestId);
-	if (!isStaff) {
-		return res.status(403).json({
-			message: 'Invalid token!!!',
-		});
-	}
 
 	try {
 		const updatedStaff = await Staff.findByIdAndUpdate(id, req.body, {
@@ -219,15 +182,6 @@ exports.updateStaff = async (req, res) => {
 exports.removeStaff = async (req, res) => {
 	const id = req.params.id;
 
-	//check if the staff making the request is still in the database
-	const requestId = req.staff._id;
-	const isStaff = await Staff.findById(requestId);
-	if (!isStaff) {
-		return res.status(403).json({
-			message: 'Invalid token!!!',
-		});
-	}
-
 	try {
 		const deletedStaff = await Staff.findByIdAndDelete(id, {
 			useFindAndModify: false,
@@ -251,15 +205,6 @@ exports.removeStaff = async (req, res) => {
 
 //delete all staffs
 exports.removeAllStaffs = async (req, res) => {
-	//check if the staff making the request is still in the database
-	const requestId = req.staff._id;
-	const isStaff = await Staff.findById(requestId);
-	if (!isStaff) {
-		return res.status(403).json({
-			message: 'Invalid token!!!',
-		});
-	}
-
 	try {
 		const deletedStaffs = await Staff.deleteMany({});
 		if (deletedStaffs) {
@@ -277,14 +222,6 @@ exports.removeAllStaffs = async (req, res) => {
 
 //Sign out staff
 exports.signOutStaff = async (req, res) => {
-	//check if the staff making the request is still in the database
-	const requestId = req.staff._id;
-	const isStaff = await Staff.findById(requestId);
-	if (!isStaff) {
-		return res.status(403).json({
-			message: 'Invalid token!!!',
-		});
-	}
 	delete req.header('auth-token');
 
 	res.status(200).json({

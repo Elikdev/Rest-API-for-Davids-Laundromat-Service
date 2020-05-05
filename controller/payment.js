@@ -7,15 +7,6 @@ const { validationResult } = require('express-validator');
 
 //get all payments made
 exports.getPayments = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const payments = await Payment.find()
 			.populate('wash', 'washDate')
@@ -41,14 +32,6 @@ exports.getPayments = async (req, res) => {
 //get a single payment
 exports.getPaymentById = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const payment = await Payment.findById(id)
@@ -96,13 +79,7 @@ exports.newPayment = async (req, res) => {
 		//modify the date
 
 		const date = new Date();
-		const payment_date = date.toString();
-
-		const registeredStaff = await Staff.findById(id);
-		if (!registeredStaff)
-			return res
-				.status(401)
-				.json({ message: 'Sorry, you no longer have access to this route' });
+		const payment_date = date.toISOString();
 
 		const payment = new Payment({
 			washId,
@@ -170,14 +147,6 @@ exports.newPayment = async (req, res) => {
 //delete a payment
 exports.deletePaymentById = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const deletedPayment = await Payment.findByIdAndRemove(id, {
@@ -203,15 +172,6 @@ exports.deletePaymentById = async (req, res) => {
 
 //delete all payments
 exports.deleteAllPayments = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const deletedPayments = await Payment.deleteMany({});
 
