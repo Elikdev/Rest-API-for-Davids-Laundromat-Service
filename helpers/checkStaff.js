@@ -21,8 +21,9 @@ module.exports = (req, res, next) => {
 				});
 			});
 	} catch (error) {
-		res.status(403).json({
-			message: 'Invalid token!!!',
+		res.status(500).json({
+			message: 'Error in verifying user',
+			error: error.message,
 		});
 	}
 };
