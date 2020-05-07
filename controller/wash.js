@@ -6,15 +6,6 @@ const { validationResult } = require('express-validator');
 
 //get all washes
 exports.allWashes = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const washes = await Wash.find()
 			.populate('payment', 'payment_date payment_mode amount')
@@ -41,14 +32,6 @@ exports.allWashes = async (req, res) => {
 //get wash by Id
 exports.getWash = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	try {
 		const wash = await Wash.findOne({ _id: id });
@@ -74,13 +57,6 @@ exports.getWash = async (req, res) => {
 exports.getWashByDlsId = async (req, res) => {
 	const washId = req.body.washId;
 	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
 
 	const errors = validationResult(req);
 
@@ -128,12 +104,6 @@ exports.newWash = async (req, res) => {
 
 	const name = customer_name.toLowerCase();
 
-	const registeredStaff = await Staff.findById(id);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	//get the customer doc
 	const customerDoc = await Customer.findOne({
 		customer_name: name,
@@ -144,7 +114,7 @@ exports.newWash = async (req, res) => {
 		});
 
 	const date = new Date();
-	const washDate = date.toString();
+	const washDate = date.toISOString();
 	const modifiedAmount = `\u20A6${amount.toString()}`;
 
 	const wash = new Wash({
@@ -172,7 +142,7 @@ exports.newWash = async (req, res) => {
 			//Finally, update the wash with staff id, washID  and customer id
 			const updatedWash = await Wash.findByIdAndUpdate(
 				{ _id: washDoc._id },
-				{ staff: registeredStaff._id, washId, customer: customerDoc._id },
+				{ staff: updatedStaff._id, washId, customer: customerDoc._id },
 				{ new: true, useFindAndModify: false }
 			);
 
@@ -191,15 +161,6 @@ exports.newWash = async (req, res) => {
 //delete wash by Id
 exports.deleteWash = async (req, res) => {
 	const id = req.params.id;
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const deletedWash = await Wash.findByIdAndDelete(id, {
 			useFindAndModify: false,
@@ -223,15 +184,6 @@ exports.deleteWash = async (req, res) => {
 
 //delete all washes
 exports.removeAllWashes = async (req, res) => {
-	const staffId = req.staff._id;
-
-	//check if the staff making the request is still a registered staff
-	const registeredStaff = await Staff.findById(staffId);
-	if (!registeredStaff)
-		return res
-			.status(401)
-			.json({ message: 'Sorry, you do not have access to this route' });
-
 	try {
 		const deletedWashes = await Wash.deleteMany({});
 		if (deletedWashes) {
