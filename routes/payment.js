@@ -1,6 +1,4 @@
 const paymentRouter = require('express').Router();
-const auth = require('../helpers/verifyToken'); //middleware
-const checkStaff = require('../helpers/checkStaff'); //middleware
 const { check } = require('express-validator');
 
 //Controllers
@@ -18,20 +16,19 @@ const validatePayment = [
 	check('washId', 'washId field is empty').notEmpty(),
 ];
 
-//All routes here require auth-token
 //get all payments
-paymentRouter.get('/all', auth, checkStaff, getPayments);
+paymentRouter.get('/all', getPayments);
 
 //get payment by id
-paymentRouter.get('/:id', auth, checkStaff, getPaymentById);
+paymentRouter.get('/:id', getPaymentById);
 
 //new payment
-paymentRouter.post('/new', auth, checkStaff, validatePayment, newPayment);
+paymentRouter.post('/new', validatePayment, newPayment);
 
 //delete payment by Id
-paymentRouter.delete('/:id', auth, checkStaff, deletePaymentById);
+paymentRouter.delete('/:id', deletePaymentById);
 
 //delete all payments
-paymentRouter.delete('/delete/all', auth, checkStaff, deleteAllPayments);
+paymentRouter.delete('/delete/all', deleteAllPayments);
 
 module.exports = paymentRouter;
