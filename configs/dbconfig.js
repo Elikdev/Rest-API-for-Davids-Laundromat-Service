@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const config = require('./config');
 
 //get the db connection string
-const dbCs = config.MONGODB_URI;
+const dbConnectionString = config.MONGODB_URI;
 
 //a function that handles the db connection
 const dbConnection = () => {
 	mongoose
-		.connect(dbCs, {
+		.connect(dbConnectionString, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		})
@@ -15,7 +15,7 @@ const dbConnection = () => {
 			console.log('Successfully connected to the database');
 		})
 		.catch((err) => {
-			console.error(err.message);
+			console.error(" db connect error >>> ", err.message);
 		});
 };
 

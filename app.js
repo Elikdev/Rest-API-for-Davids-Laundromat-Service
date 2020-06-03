@@ -29,7 +29,7 @@ app.get('/api/v1', (req, res) => {
 });
 
 //authorization middlewares
-app.use(verifyToken);
+//app.use(verifyToken);
 app.use(checkStaff);
 
 //basic routes declarations
