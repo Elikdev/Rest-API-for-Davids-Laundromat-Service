@@ -43,24 +43,24 @@
     //                 sh "docker rmi ${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${imageTag}"
     //         }
     //     }
-    // } catch (caughtError) {
-    //     err = caughtError
-    //     currentBuild.result = "FAILURE"
-    // } finally {
-    //     timeSpent = "\nTime spent: ${timeDiff(start)}"
-    //     if (err) {
-    //         slackSend (color: 'danger', message: ":disappointed: _Build failed_: ${jobInfo} ${timeSpent} ${err}")
-    //     } else {
-    //         if (currentBuild.previousBuild == null) {
-    //             buildStatus = '_First time build_'
-    //         } else if (currentBuild.previousBuild.result == 'SUCCESS') {
-    //             buildStatus = '_Build complete_'
-    //         } else {
-    //             buildStatus = '_Back to normal_'
-    //         }
-    //         slackSend (color: 'good', message: "${jobInfo}: ${timeSpent}")
-    //     }
-    // }
+    } catch (caughtError) {
+        err = caughtError
+        currentBuild.result = "FAILURE"
+    } finally {
+        timeSpent = "\nTime spent: ${timeDiff(start)}"
+        if (err) {
+            slackSend (color: 'danger', message: ":disappointed: _Build failed_: ${jobInfo} ${timeSpent} ${err}")
+        } else {
+            if (currentBuild.previousBuild == null) {
+                buildStatus = '_First time build_'
+            } else if (currentBuild.previousBuild.result == 'SUCCESS') {
+                buildStatus = '_Build complete_'
+            } else {
+                buildStatus = '_Back to normal_'
+            }
+            slackSend (color: 'good', message: "${jobInfo}: ${timeSpent}")
+        }
+    }
     // def deploy(deploymentName, imageTag, projectName,repoName, isMaster){
     //     def namespace = isMaster ? "production" : "staging"
     //     sh("sed -i.bak 's|${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:latest|${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${env.BUILD_NUMBER}|' ./kubernetes/decryption-portal-backend-deployment.yml")
@@ -70,7 +70,7 @@
     //     catch (err) {
     //         slackSend (color: 'danger', message: ":disappointed: _Build failed_: ${jobInfo} ${err}")
     //     }
-    // }
+     }
 
     def pushImage(repoName, projectName, imageTag){
         try{
@@ -88,3 +88,5 @@
         def minutes = delta.intdiv(60 * 1000) % 60
         return "${minutes} min ${seconds} sec"
     }
+        
+    
