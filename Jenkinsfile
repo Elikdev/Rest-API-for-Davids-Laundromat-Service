@@ -43,6 +43,7 @@
     //                 sh "docker rmi ${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${imageTag}"
     //         }
     //     }
+        }
     } catch (caughtError) {
         err = caughtError
         currentBuild.result = "FAILURE"
@@ -60,6 +61,5 @@
             }
             slackSend (color: 'good', message: "${jobInfo}: ${timeSpent}")
         }
-    }
     }
     
