@@ -61,32 +61,5 @@
             slackSend (color: 'good', message: "${jobInfo}: ${timeSpent}")
         }
     }
-    // def deploy(deploymentName, imageTag, projectName,repoName, isMaster){
-    //     def namespace = isMaster ? "production" : "staging"
-    //     sh("sed -i.bak 's|${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:latest|${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${env.BUILD_NUMBER}|' ./kubernetes/decryption-portal-backend-deployment.yml")
-    //     try{
-    //         sh "kubectl apply --namespace=${namespace}  -f kubernetes/ --context i-040acc9d4cf316c92@k8scluster.us-west-2.eksctl.io"
-    //     }
-    //     catch (err) {
-    //         slackSend (color: 'danger', message: ":disappointed: _Build failed_: ${jobInfo} ${err}")
-    //     }
-     }
-
-    def pushImage(repoName, projectName, imageTag){
-        try{
-            sh "docker push ${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${imageTag}"
-        }catch(e){
-            sh "aws ecr create-repository --repository-name ${projectName}/${repoName} --region ${AWS_ECR_REGION}"
-            sh "aws ecr set-repository-policy --repository-name ${projectName}/${repoName} --policy-text file://policy.json --region ${AWS_ECR_REGION}"
-            sh "docker push ${AWS_ECR_ACCOUNT}/${projectName}/${repoName}:${imageTag}"
-        }
     }
-
-    def timeDiff(st) {
-        def delta = (new Date()).getTime() - st.getTime()
-        def seconds = delta.intdiv(1000) % 60
-        def minutes = delta.intdiv(60 * 1000) % 60
-        return "${minutes} min ${seconds} sec"
-    }
-        
     
