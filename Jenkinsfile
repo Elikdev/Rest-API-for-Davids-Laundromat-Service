@@ -3,7 +3,7 @@
     import groovy.json.*
     def repoName = 'Rest-API-for-Davids-Laundromat-Service'
     def projectName = 'global'
-    def deploymentName = 'Laundromart Service'
+    def deploymentName = 'laundromat-backend'
 
     def isMaster = env.BRANCH_NAME == 'master'
     def isStaging = env.BRANCH_NAME == 'staging'
@@ -26,6 +26,18 @@
                 checkout scm
                 slackSend (color: 'good', message: "Successfully  Pulled `${repoName}` ...")
             }
+
+            stage('Stop Running container'){
+
+            }
+
+            stage('build docker image'){
+                sh "docker build -t ${deploymentName} ."
+                sh("docker tag laundromat-backend:latest ${AWS_ECR_ACCOUNT}/${deploymentName}:latest")
+
+                slackSend (color: 'good', message: "Built ang tagged Docker image for `${repoName}` ...")
+            }
+
 
     //     stage ('Push Docker to AWS ECR') {
     //             sh "\$(aws ecr get-login --no-include-email --region ${AWS_ECR_REGION})"
@@ -59,7 +71,9 @@
             } else {
                 buildStatus = '_Back to normal_'
             }
-            slackSend (color: 'good', message: "${jobInfo}: ${timeSpent}")
+
+            slackSend (color: 'good', message: ":fire: Nice work! `${repoName}` deployed to *_Server_*")
+
         }
     }
 
