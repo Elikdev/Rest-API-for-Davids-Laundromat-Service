@@ -4,6 +4,7 @@
     def repoName = 'Rest-API-for-Davids-Laundromat-Service'
     def projectName = 'global'
     def deploymentName = 'laundromat-backend'
+    def awsEcrAccount = '247873396279.dkr.ecr.eu-west-1.amazonaws.com'
 
     def isMaster = env.BRANCH_NAME == 'master'
     def isStaging = env.BRANCH_NAME == 'staging'
@@ -33,7 +34,7 @@
 
             stage('build docker image'){
                 sh "docker build -t ${deploymentName} ."
-                sh("docker tag laundromat-backend:latest ${AWS_ECR_ACCOUNT}/${deploymentName}:latest")
+                sh("docker tag laundromat-backend:latest ${awsEcrAccount}/${deploymentName}:latest")
 
                 slackSend (color: 'good', message: "Built ang tagged Docker image for `${repoName}` ...")
             }
