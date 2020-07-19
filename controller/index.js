@@ -56,6 +56,9 @@ exports.getStaff = async (req, res) => {
 };
 
 //register a Staff / sign-up
+	// you can wrap all these in a try and check for any errors so the user isn't left
+	// hanging
+
 exports.registerStaff = async (req, res) => {
 	const { name, email, password, mobile_num, address } = req.body;
 
@@ -85,7 +88,11 @@ exports.registerStaff = async (req, res) => {
 		resumption_date,
 	});
 
-	//Generate a token for the staff and save to the headers
+	//Generate a token for the staff and save to the 
+	
+	//check for errors here,
+	//this can break and not send errors to the users
+
 	const accesstoken = await jwt.sign(
 		{ _id: newStaff._id },
 		config.SECRET_TOKEN,

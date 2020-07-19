@@ -45,14 +45,11 @@ exports.register = async (req, res) => {
 				'Customer with the same email as been registered... try another email or update existing customer',
 		});
 
-	//modify the mobile number to a nigerian number
-	modifiedNum = `(+234)-${mobile_num}`;
-
 	const name = customer_name.toLowerCase();
 	const user = new Customer({
 		customer_name: name,
 		email,
-		mobile_num: modifiedNum,
+		mobile_num,
 		address,
 	});
 

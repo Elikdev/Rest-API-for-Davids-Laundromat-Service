@@ -1,6 +1,4 @@
 const washRouter = require('express').Router();
-const auth = require('../helpers/verifyToken'); //middleware
-const checkStaff = require('../helpers/checkStaff'); //middleware
 const { check } = require('express-validator');
 
 //controllers
@@ -11,6 +9,7 @@ const {
 	newWash,
 	deleteWash,
 	removeAllWashes,
+	logger,
 } = require('../controller/wash');
 
 //validation
@@ -22,23 +21,22 @@ const validateWash = [
 
 const validateId = [check('washId', 'washId is empty').notEmpty()];
 
-//All routes here require auth-token
 //get all washes
-washRouter.get('/all', auth, checkStaff, allWashes);
+washRouter.get('/all', allWashes);
 
 //get wash by _id
-washRouter.get('/:id', auth, checkStaff, getWash);
+washRouter.get('/:id', getWash);
 
 //get wash by washId
-washRouter.get('/washid/find', validateId, auth, checkStaff, getWashByDlsId);
+washRouter.get('/washid/find', validateId, getWashByDlsId);
 
 //make a new wash
-washRouter.post('/new', validateWash, auth, checkStaff, newWash);
+washRouter.post('/new', validateWash, newWash);
 
 //delete a wash
-washRouter.delete('/:id', auth, checkStaff, deleteWash);
+washRouter.delete('/:id', deleteWash);
 
 //delete all washes
-washRouter.delete('/delete/all', auth, checkStaff, removeAllWashes);
+washRouter.delete('/delete/all', removeAllWashes);
 
 module.exports = washRouter;

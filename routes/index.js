@@ -1,6 +1,4 @@
 const indexRouter = require('express').Router();
-const auth = require('../helpers/verifyToken'); //middleware
-const checkStaff = require('../helpers/checkStaff'); //middleware
 const { check, body } = require('express-validator');
 const models = require('../models/index');
 const Staff = models.Staff;
@@ -50,28 +48,27 @@ const validateLogin = [
 ];
 
 //register a new staff
-indexRouter.post('/register', validateRegister, registerStaff);
+indexRouter.post('/signup', validateRegister, registerStaff);
 
 //sign in staff
 indexRouter.post('/signin', validateLogin, signInStaff);
 
 //signout staff
-indexRouter.get('/signout', auth, signOutStaff);
+indexRouter.get('/signout', signOutStaff);
 
-//all routes here require auth-token
 //get all staffs
-indexRouter.get('/all', auth, checkStaff, allStaffs);
+indexRouter.get('/all', allStaffs);
 
 //get staff by id
-indexRouter.get('/:id', auth, checkStaff, getStaff);
+indexRouter.get('/:id', getStaff);
 
 //update staff by id
-indexRouter.put('/update/:id', auth, checkStaff, updateStaff);
+indexRouter.put('/update/:id', updateStaff);
 
 //delete staff by id
-indexRouter.delete('/:id', auth, checkStaff, removeStaff);
+indexRouter.delete('/:id', removeStaff);
 
 //delete all the staffs
-indexRouter.delete('/delete/all', auth, checkStaff, removeAllStaffs);
+indexRouter.delete('/delete/all', removeAllStaffs);
 
 module.exports = indexRouter;

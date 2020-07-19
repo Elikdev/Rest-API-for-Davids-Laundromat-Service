@@ -6,6 +6,7 @@ const customerRouter = require('./routes/customer');
 const washRouter = require('./routes/wash');
 const paymentRouter = require('./routes/payment');
 const config = require('./configs/config');
+const { verifyToken, checkStaff } = require('./helpers/verifyToken');
 
 //load them directly from the configs folder
 const port = config.PORT;
@@ -26,6 +27,10 @@ app.get('/api/v1', (req, res) => {
 		message: 'Welcome to Davids Laundromat Services',
 	});
 });
+
+//authorization middlewares
+//app.use(verifyToken);
+app.use(checkStaff);
 
 //basic routes declarations
 app.use('/api/v1/staff', indexRouter);
